@@ -1,0 +1,138 @@
+version: '3'
+services:
+  roscore:
+    network_mode: host
+    image: ros:kinetic-robot-xenial
+    restart: always
+    volumes:
+      - ./logs:/root/.ros/log:rw
+    env_file:
+      - ./ros.env
+    command: roscore
+  monitor:
+    image: jeguzzi/df:docker-ui
+    volumes:
+      - ./logs:/root/.ros/log:rw
+      - /var/run/docker.sock:/var/run/docker.sock
+    command: roslaunch docker_ui monitor.launch 
+    network_mode: host
+    #restart: no
+    env_file:
+      - ./ros.env
+      - ./monitor.env
+    healthcheck:
+      test: ["CMD", "/bin/bash", "-c", "cat < /dev/null > /dev/tcp/localhost/11311"]
+      interval: 30s
+      timeout: 2s
+      retries: 3
+    depends_on:
+      - roscore
+
+  turtlebot_base:
+    network_mode: host
+    image: christimperley/turtlebot:binary
+    privileged: true
+    #restart: no
+    volumes:
+     - ./logs:/root/.ros/log:rw
+     - /sys/fs/cgroup:/sys/fs/cgroup:ro 
+     - /dev/kobuki:/dev/kobuki 
+     - /dev/serial:/dev/serial 
+     - /dev/bus/usb:/dev/bus/usb 
+#     - ./launch/minimal.launch:/opt/ros/kinetic/share/turtlebot_bringup/launch/minimal.launch
+#     - ./launch/mobile_base.launch.xml:/opt/ros/kinetic/share/turtlebot_bringup/launch/mobile_base.launch.xml
+#     - ./launch/kobuki/mobile_base.launch.xml:/opt/ros/kinetic/share/turtlebot_bringup/launch/includes/kobuki/mobile_base.launch.xml
+    command: roslaunch turtlebot_bringup minimal.launch
+    depends_on:
+      - roscore
+      - monitor
+    healthcheck:
+      test: ["CMD", "/bin/bash", "-c", "cat < /dev/null > /dev/tcp/localhost/11311"]
+      interval: 30s
+      timeout: 2s
+      retries: 3
+    env_file: ./ros.env
+  turtlebot_teleop_joy:
+    network_mode: host
+    image: christimperley/turtlebot:binary
+    privileged: true
+    #restart: no
+    volumes:
+     - ./launch/logitech.launch:/opt/ros/kinetic/share/turtlebot_teleop/launch/mylogitech.launch
+     - ./logs:/root/.ros/log:rw
+     - /sys/fs/cgroup:/sys/fs/cgroup:ro 
+     - /dev/kobuki:/dev/kobuki 
+     - /dev/serial:/dev/serial 
+     - /dev/bus/usb:/dev/bus/usb 
+     - /dev/input/js0:/dev/input/js0
+    command: roslaunch turtlebot_teleop mylogitech.launch
+    env_file: ./ros.env
+    depends_on:
+      - roscore
+      - turtlebot_base
+  turtlebot_astra:
+    network_mode: host
+    image: ros:astra
+    privileged: true
+    #restart: no
+    volumes:
+     - ./logs:/root/.ros/log:rw
+     - /sys/fs/cgroup:/sys/fs/cgroup:ro 
+     - ./launch/3dsensor.launch:/opt/ros/kinetic/share/turtlebot_bringup/launch/3dsensor.launch
+    command: roslaunch  turtlebot_bringup 3dsensor.launch
+    env_file: ./ros.env
+    depends_on:
+      - roscore
+      - turtlebot_base
+  turtlebot_gmapping:
+    network_mode: host
+#    image: christimperley/turtlebot:binary
+    image: ros:gmapping_reset
+    privileged: true
+    #restart: no
+    volumes:
+     - ./launch/gmapping_demo.launch:/opt/ros/kinetic/share/turtlebot_navigation/launch/mygmapping_demo.launch
+     - ./launch/navigation/move_base_params.yaml:/opt/ros/kinetic/share/turtlebot_navigation/param/move_base_params.yaml
+     - ./launch/navigation/local_costmap_params.yaml:/opt/ros/kinetic/share/turtlebot_navigation/param/local_costmap_params.yaml
+     - ./launch/navigation/global_costmap_params.yaml:/opt/ros/kinetic/share/turtlebot_navigation/param/global_costmap_params.yaml
+     - ./launch/navigation/global_planner_params.yaml:/opt/ros/kinetic/share/turtlebot_navigation/param/global_planner_params.yaml
+     - ./launch/navigation/dwa_local_planner_params.yaml:/opt/ros/kinetic/share/turtlebot_navigation/param/dwa_local_planner_params.yaml
+     - ./logs:/root/.ros/log:rw
+     - /sys/fs/cgroup:/sys/fs/cgroup:ro 
+    command: roslaunch turtlebot_navigation mygmapping_demo.launch
+    env_file: ./ros.env
+    depends_on:
+      - roscore
+      - turtlebot_base
+      - turtlebot_astra
+  turtlebot_ar:
+    network_mode: host
+    image: ros:ar_track_alvar
+    privileged: true
+    #restart: no
+    volumes:
+     - ./launch/ar_track_alvar.launch:/opt/ros/kinetic/share/ar_track_alvar/launch/myar.launch
+     - ./logs:/root/.ros/log:rw
+     - /sys/fs/cgroup:/sys/fs/cgroup:ro 
+    command: roslaunch ar_track_alvar myar.launch
+    env_file: ./ros.env
+    depends_on:
+      - roscore
+      - turtlebot_base
+      - turtlebot_astra
+  turtlebot_wrapper:
+    network_mode: host
+    image: christimperley/turtlebot:binary
+    privileged: true
+    #restart: no
+    volumes:
+     - ./launch/wrapper.launch:/wrapper.launch
+     - ./launch/velocity_smoother.launch.xml:/velocity_smoother.launch.xml
+     - ./logs:/root/.ros/log:rw
+     - /sys/fs/cgroup:/sys/fs/cgroup:ro 
+    command: roslaunch /wrapper.launch
+    env_file: ./ros.env
+    depends_on:
+      - roscore
+      - turtlebot_base
+      - turtlebot_astra
