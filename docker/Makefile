@@ -11,6 +11,7 @@ help:
 
 build:
 	@docker build --tag=tamuqcar:kvaser_bridge          kvaser_bridge/.
+	@docker build --tag=tamuqcar:pacmod          pacmod/.
 	#@docker build --tag=ros:melodic-ros-base-bionic          ros-base/.
 	#@docker build --tag=ros:melodic-robot-bionic             robot/.
 	#@docker build --tag=ros:melodic-perception-bionic        perception/.
@@ -27,6 +28,7 @@ pull:
 
 clean:
 	@docker rmi -f tamuqcar:kvaser_bridge
+	@docker rmi -f tamuqcar:pacmod
 	#@docker rmi -f ros:melodic-ros-base-bionic
 	#@docker rmi -f ros:melodic-robot-bionic
 	#@docker rmi -f ros:melodic-perception-bionic

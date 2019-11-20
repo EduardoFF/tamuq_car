@@ -52,3 +52,53 @@ services:
       timeout: 2s
       retries: 3
     env_file: ../ros.env
+
+  pacmod:
+    network_mode: host
+    image: tamuqcar:pacmod
+    privileged: true
+    restart: always
+    volumes:
+     - ./logs:/root/.ros/log:rw
+     - /sys/fs/cgroup:/sys/fs/cgroup:ro
+     - /var/run/docker.sock:/host/var/run/docker.sock 
+     - /proc:/host/proc:ro 
+     - /boot:/host/boot:ro 
+     - /lib/modules:/host/lib/modules:ro 
+     - /usr:/host/usr:ro 
+     - ./launch/pacmod.launch:/pacmod.launch
+    command: roslaunch /pacmod.launch
+    depends_on:
+      - roscore
+      - monitor
+    healthcheck:
+      test: ["CMD", "/bin/bash", "-c", "cat < /dev/null > /dev/tcp/localhost/11311"]
+      interval: 30s
+      timeout: 2s
+      retries: 3
+    env_file: ../ros.env
+
+  pacmod_joy:
+    network_mode: host
+    image: tamuqcar:pacmod
+    privileged: true
+    restart: always
+    volumes:
+     - ./logs:/root/.ros/log:rw
+     - /sys/fs/cgroup:/sys/fs/cgroup:ro
+     - /var/run/docker.sock:/host/var/run/docker.sock 
+     - /proc:/host/proc:ro 
+     - /boot:/host/boot:ro 
+     - /lib/modules:/host/lib/modules:ro 
+     - /usr:/host/usr:ro 
+     - ./launch/pacmod_game_control.launch:/pacmod_game_control.launch
+    command: roslaunch /pacmod_game_control.launch
+    depends_on:
+      - roscore
+      - monitor
+    healthcheck:
+      test: ["CMD", "/bin/bash", "-c", "cat < /dev/null > /dev/tcp/localhost/11311"]
+      interval: 30s
+      timeout: 2s
+      retries: 3
+    env_file: ../ros.env
