@@ -14,7 +14,7 @@ services:
     volumes:
       - ./logs:/root/.ros/log:rw
       - /var/run/docker.sock:/var/run/docker.sock
-    command: roslaunch docker_ui monitor.launch 
+    command: roslaunch --wait docker_ui monitor.launch 
     network_mode: host
     restart: always
     env_file:
@@ -42,7 +42,7 @@ services:
      - /lib/modules:/host/lib/modules:ro 
      - /usr:/host/usr:ro 
      - ./launch/kvaser_bridge.launch:/kvaser_bridge.launch
-    command: roslaunch /kvaser_bridge.launch
+    command: roslaunch --wait /kvaser_bridge.launch
     depends_on:
       - roscore
       - monitor
@@ -67,7 +67,7 @@ services:
      - /lib/modules:/host/lib/modules:ro 
      - /usr:/host/usr:ro 
      - ./launch/pacmod.launch:/pacmod.launch
-    command: roslaunch /pacmod.launch
+    command: roslaunch --wait /pacmod.launch
     depends_on:
       - roscore
       - monitor
@@ -92,7 +92,7 @@ services:
      - /lib/modules:/host/lib/modules:ro 
      - /usr:/host/usr:ro 
      - ./launch/pacmod_game_control.launch:/pacmod_game_control.launch
-    command: roslaunch /pacmod_game_control.launch
+    command: roslaunch --wait /pacmod_game_control.launch
     depends_on:
       - roscore
       - monitor
