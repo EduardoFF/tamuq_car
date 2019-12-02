@@ -1,0 +1,90 @@
+version: '2.3'
+services:
+  vlp16:
+    network_mode: host
+    image: autoware/autoware:latest-melodic-cuda
+    privileged: true
+    restart: always
+    volumes:
+     - ./logs:/root/.ros/log:rw
+     - /sys/fs/cgroup:/sys/fs/cgroup:ro
+     - /var/run/docker.sock:/host/var/run/docker.sock 
+     - /proc:/host/proc:ro 
+     - /boot:/host/boot:ro 
+     - /lib/modules:/host/lib/modules:ro 
+     - /usr:/host/usr:ro 
+     - ./launch/vlp16.launch:/vlp16.launch
+     - ./launch/autoware_defaults.yaml:/autoware_defaults.yaml
+     - ./ros_entrypoint.sh:/ros_entrypoint.sh
+    command: bash -c "/ros_entrypoint.sh roslaunch --wait /vlp16.launch"  
+#    command: /ros_entrypoint.sh roslaunch runtime_manager runtime_manager.launch
+    healthcheck:
+      test: ["CMD", "/bin/bash", "-c", "cat < /dev/null > /dev/tcp/localhost/11311"]
+      interval: 30s
+      timeout: 2s
+      retries: 3
+    env_file: ../ros.env
+  zed_center:
+    network_mode: host
+    image: tamuqcar:zed
+    runtime: nvidia
+    privileged: true
+    user: root
+    restart: always
+    volumes:
+     - ./logs:/root/.ros/log:rw
+     - ./SN19505.conf:/usr/local/zed/settings/SN19505.conf
+     - ./params/zed_center/common.yaml:/home/ros/catkin_ws/src/zed-ros-wrapper/zed_wrapper/params/common.yaml
+     - ./params/zed_center/zed.yaml:/home/ros/catkin_ws/src/zed-ros-wrapper/zed_wrapper/params/zed.yaml
+     - ./launch/zed_center/zed_camera.launch:/home/ros/catkin_ws/src/zed-ros-wrapper/zed_wrapper/launch/zed_camera.launch
+     - ./launch/zed_center/zed.launch:/home/ros/catkin_ws/src/zed-ros-wrapper/zed_wrapper/launch/zed.launch
+     #- /sys/fs/cgroup:/sys/fs/cgroup:ro
+     #- /var/run/docker.sock:/host/var/run/docker.sock 
+     #- /proc:/host/proc:ro 
+     #- /boot:/host/boot:ro 
+     #- /lib/modules:/host/lib/modules:ro 
+     #- /usr:/host/usr:ro 
+     #- ./launch/vlp16.launch:/vlp16.launch
+     #- ./launch/autoware_defaults.yaml:/autoware_defaults.yaml
+     #- ./ros_entrypoint.sh:/ros_entrypoint.sh
+    command: bash -c ". /home/ros/.bashrc; source /home/ros/catkin_ws/devel/setup.bash; env; roslaunch --wait zed_wrapper zed.launch"  
+#    command: /ros_entrypoint.sh roslaunch runtime_manager runtime_manager.launch
+    healthcheck:
+      test: ["CMD", "/bin/bash", "-c", "cat < /dev/null > /dev/tcp/localhost/11311"]
+      interval: 30s
+      timeout: 2s
+      retries: 3
+    env_file: ../ros.env
+  zed_right:
+    network_mode: host
+    image: tamuqcar:zed
+    runtime: nvidia
+    privileged: true
+    user: root
+    restart: always
+    volumes:
+     - ./logs:/root/.ros/log:rw
+     - ./SN19507.conf:/usr/local/zed/settings/SN19507.conf
+     - ./params/zed_right/common.yaml:/home/ros/catkin_ws/src/zed-ros-wrapper/zed_wrapper/params/common.yaml
+     - ./params/zed_right/zed.yaml:/home/ros/catkin_ws/src/zed-ros-wrapper/zed_wrapper/params/zed.yaml
+     - ./launch/zed_right/zed_camera.launch:/home/ros/catkin_ws/src/zed-ros-wrapper/zed_wrapper/launch/zed_camera.launch
+     - ./launch/zed_right/zed.launch:/home/ros/catkin_ws/src/zed-ros-wrapper/zed_wrapper/launch/zed.launch
+     #- /sys/fs/cgroup:/sys/fs/cgroup:ro
+     #- /var/run/docker.sock:/host/var/run/docker.sock 
+     #- /proc:/host/proc:ro 
+     #- /boot:/host/boot:ro 
+     #- /lib/modules:/host/lib/modules:ro 
+     #- /usr:/host/usr:ro 
+     #- ./launch/vlp16.launch:/vlp16.launch
+     #- ./launch/autoware_defaults.yaml:/autoware_defaults.yaml
+     #- ./ros_entrypoint.sh:/ros_entrypoint.sh
+    command: bash -c ". /home/ros/.bashrc; source /home/ros/catkin_ws/devel/setup.bash; env; roslaunch --wait zed_wrapper zed.launch"  
+#    command: /ros_entrypoint.sh roslaunch runtime_manager runtime_manager.launch
+    healthcheck:
+      test: ["CMD", "/bin/bash", "-c", "cat < /dev/null > /dev/tcp/localhost/11311"]
+      interval: 30s
+      timeout: 2s
+      retries: 3
+    env_file: ../ros.env
+
+

@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<launch>
+  <!--
+Found out that autoware is loading these params when runtime_manager starts
+['rosparam', 'set', 'tf_x', '1.2']
+['rosparam', 'set', 'tf_y', '0.0']
+['rosparam', 'set', 'tf_z', '2.0']
+['rosparam', 'set', 'tf_yaw', '0.0']
+['rosparam', 'set', 'tf_pitch', '0.0']
+['rosparam', 'set', 'tf_roll', '0.0']
+['rosparam', 'set', 'localizer', 'velodyne']
+
+Then run vlp16 launch without arguments
+  -->
+  <rosparam command="load" file="/autoware_defaults.yaml" />
+  <!--roslaunch runtime_manager velodyne_vlp16.launch-->
+   <include file="$(find runtime_manager)/launch_files/velodyne_vlp16.launch">
+   </include>
+</launch>
