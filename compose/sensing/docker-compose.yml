@@ -87,4 +87,26 @@ services:
       retries: 3
     env_file: ../ros.env
 
+  vectornav:
+    network_mode: host
+    image: tamuqcar:vectornav
+    privileged: true
+    restart: always
+    volumes:
+     - ./logs:/root/.ros/log:rw
+     - /sys/fs/cgroup:/sys/fs/cgroup:ro
+     - /var/run/docker.sock:/host/var/run/docker.sock 
+     - /proc:/host/proc:ro 
+     - /boot:/host/boot:ro 
+     - /lib/modules:/host/lib/modules:ro 
+     - /usr:/host/usr:ro
+     - ./launch/vectornav.launch:/catkin_ws/src/vectornav/launch/vectornav.launch
+    command: bash -c "/ros_entrypoint.sh roslaunch --wait vectornav vectornav.launch"  
+#    command: /ros_entrypoint.sh roslaunch runtime_manager runtime_manager.launch
+    healthcheck:
+      test: ["CMD", "/bin/bash", "-c", "cat < /dev/null > /dev/tcp/localhost/11311"]
+      interval: 30s
+      timeout: 2s
+      retries: 3
+    env_file: ../ros.env
 

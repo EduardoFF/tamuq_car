@@ -1,0 +1,3 @@
+TODO:
+
+- robustness of vectornav. If USB gets disconected, it can be restarted. Maybe using udev rules for vectornav
