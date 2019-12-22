@@ -101,6 +101,8 @@ services:
      - /lib/modules:/host/lib/modules:ro 
      - /usr:/host/usr:ro
      - ./launch/vectornav.launch:/catkin_ws/src/vectornav/launch/vectornav.launch
+     - ./launch/imu_tf.launch:/catkin_ws/src/vectornav/launch/imu_tf.launch
+     - ./launch/vn100.yaml:/catkin_ws/src/vectornav/params/vn100.yaml
     command: bash -c "/ros_entrypoint.sh roslaunch --wait vectornav vectornav.launch"  
 #    command: /ros_entrypoint.sh roslaunch runtime_manager runtime_manager.launch
     healthcheck:

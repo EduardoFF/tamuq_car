@@ -3,7 +3,10 @@
 
 	<node pkg="vectornav" type="vnpub" name="vectornav" respawn="false" required="true"> 
       <rosparam command="load" file="$(find vectornav)/params/vn100.yaml" />	  
-	</node>	
+	</node>
+	<include file="$(find vectornav)/launch/imu_tf.launch"/>
+
+
 	
 </launch>
 
