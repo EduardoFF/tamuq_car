@@ -1,0 +1,5 @@
+- Configured dnsmasq to listen ethernet interface
+- Changing /etc/hosts file does the trick
+-  It seems that the name is resolved using the TAMUQ nameserver
+	TODO: understand how does it work
+
